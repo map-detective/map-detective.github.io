@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 # GITHUB_TOKENの権限を設定 (GitHub Pagesへのデプロイに必要)
