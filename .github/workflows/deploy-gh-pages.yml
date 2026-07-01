@@ -1,0 +1,65 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+# GITHUB_TOKENの権限を設定 (GitHub Pagesへのデプロイに必要)
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時デプロイの競合を防ぐ設定
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.14'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          NODE_ENV: production
+          VUE_APP_PUBLIC_PATH: /${{ github.event.repository.name }}/
+          VUE_APP_API_KEY: ${{ secrets.GMAP_API_KEY }}
+          VUE_APP_FIREBASE_API_KEY: ${{ secrets.VUE_APP_FIREBASE_API_KEY }}
+          VUE_APP_FIREBASE_AUTH_DOMAIN: ${{ secrets.VUE_APP_FIREBASE_AUTH_DOMAIN }}
+          VUE_APP_FIREBASE_DATABASE_URL: ${{ secrets.VUE_APP_FIREBASE_DATABASE_URL }}
+          VUE_APP_FIREBASE_PROJECT_ID: ${{ secrets.VUE_APP_FIREBASE_PROJECT_ID }}
+          VUE_APP_STORAGE_BUCKET: ${{ secrets.VUE_APP_STORAGE_BUCKET }}
+          VUE_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VUE_APP_FIREBASE_MESSAGING_SENDER_ID }}
+          VUE_APP_FIREBASE_APP_ID: ${{ secrets.VUE_APP_FIREBASE_APP_ID }}
+          VUE_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.VUE_APP_FIREBASE_MEASUREMENT_ID }}
+        run: npm run build
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
