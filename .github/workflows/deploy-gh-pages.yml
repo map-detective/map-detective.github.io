@@ -36,7 +36,7 @@ jobs:
       - name: Build
         env:
           NODE_ENV: production
-          VUE_APP_PUBLIC_PATH: /${{ github.event.repository.name }}/
+          VUE_APP_PUBLIC_PATH: /room-k-guess/
           VUE_APP_API_KEY: ${{ secrets.GMAP_API_KEY }}
           VUE_APP_FIREBASE_API_KEY: ${{ secrets.VUE_APP_FIREBASE_API_KEY }}
           VUE_APP_FIREBASE_AUTH_DOMAIN: ${{ secrets.VUE_APP_FIREBASE_AUTH_DOMAIN }}
