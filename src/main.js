@@ -24,6 +24,7 @@ Vue.use(GmapVue, {
         key: process.env.VUE_APP_API_KEY,
         language: localStorage.getItem('language'),
         v: 'weekly',
+        loading: 'async',
     },
 });
 Vue.config.productionTip = false;
