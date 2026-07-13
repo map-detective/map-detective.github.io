@@ -5,9 +5,6 @@ exports[`SearchBox.vue render 1`] = `
   <h2>0 visited places</h2>
   <div class="search-box__btns">
     <v-btn-stub color="primary" rounded="true" tag="button" activeclass="" large="true" type="button" class="search-box__btns__btn">
-      Single Player
-    </v-btn-stub>
-    <v-btn-stub color="secondary" rounded="true" tag="button" activeclass="" large="true" type="button" class="search-box__btns__btn">
       With Friends
     </v-btn-stub>
     <dialogroom-stub></dialogroom-stub>

@@ -30,12 +30,14 @@ describe('settingsStore.js', () => {
     });
 
     it('setPlayerName will commit playerName', ()=>{
-        const spy = jest.spyOn(window.localStorage.__proto__, 'setItem');
         const commit = jest.fn();
-        settingsStore.actions.setPlayerName({commit}, 'Toto');
+        const state = { players: [], name: '' };
+        settingsStore.actions.setPlayerName({ commit, state }, 'Toto');
 
-        expect(commit).toBeCalledWith(MutationTypes.SETTINGS_SET_PLAYER_NAME,'Toto');
-        expect(spy).toHaveBeenCalledWith('playerName', 'Toto');
+        expect(commit).toBeCalledWith(
+            MutationTypes.SETTINGS_SET_PLAYER_NAME,
+            { playerName: 'Toto', invalid: false }
+        );
     });
 
 });
