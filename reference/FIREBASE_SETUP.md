@@ -23,6 +23,8 @@
     - `VUE_APP_FIREBASE_APP_ID`
     - `VUE_APP_FIREBASE_MEASUREMENT_ID`（Google Analytics を使用しないので空欄でOK）
 
+* GitHub Pagesでホスティングする場合は、`.env`を利用しません。[GitHub Pages Setup for map-detective](GITHUB_SETUP.md)をご覧ください。
+
 ---
 
 ## Realtime Database の設定
