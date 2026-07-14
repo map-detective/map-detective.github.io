@@ -29,8 +29,9 @@ VITE_MAPS_API_KEY=あなたのGoogleMapsAPIキー
 
 Firebase のプロジェクト作成やマルチプレイ設定、Firebase Hosting によるデプロイについては、以下のドキュメントを参照してください：
 
-- [Firebase セットアップ手順](FIREBASE_SETUP.md)
-- [Google Maps API 設定手順](GOOGLE_MAPS_SETUP.md)
+- [Firebase セットアップ手順](reference/FIREBASE_SETUP.md)
+- [Google Maps API 設定手順](reference/GOOGLE_MAPS_SETUP.md)
+- [GitHub Pagesでの設定手順](reference/GITHUB_SETUP.md)
 
 ## 🕹️ 遊び方
 
