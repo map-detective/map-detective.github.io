@@ -1,6 +1,6 @@
-# Firebase Setup for room-k-guess
+# Firebase Setup for map-detective
 
-このドキュメントは、GeoGuess クローン「room-k-guess」に Firebase を導入してマルチプレイ機能を有効化するためのセットアップ手順をまとめたものです。
+このドキュメントは、GeoGuess クローン「map-detective」に Firebase を導入してマルチプレイ機能を有効化するためのセットアップ手順をまとめたものです。
 
 ## プラン選択
 - **Sparkプラン（無料）** を選択してください。

@@ -7,7 +7,7 @@
                     class="header__logo-min"
                     src="@/../public/img/icons/android-icon-72x72.png"
                 />
-                <span class="header__subtitle">for room-K</span>
+                <span class="header__subtitle"></span>
             </router-link>
 
             <div class="flex-grow-1" />

@@ -1,6 +1,6 @@
-# room-k-guess
+# map-detective
 
-**room-k-guess** は、オープンソースの地理推測ゲーム [GeoGuess](https://github.com/GeoGuess/GeoGuess) をベースに、自分専用にカスタマイズしたプロジェクトです。広告を完全に除去し、Google Maps API キーを使ってセルフホストでプレイできます。
+**map-detective** は、オープンソースの地理推測ゲーム [GeoGuess](https://github.com/GeoGuess/GeoGuess) をベースに、自分専用にカスタマイズしたプロジェクトです。広告を完全に除去し、Google Maps API キーを使ってセルフホストでプレイできます。
 
 ## 🔄 このリポジトリの変更点
 
@@ -13,8 +13,8 @@
 ## 🚀 セットアップ方法（ローカル）
 
 ```bash
-git clone https://github.com/tabei-hiroki/room-k-guess.git
-cd room-k-guess
+git clone https://github.com/map-detective/map-detective.github.io.git
+cd map-detective
 npm install
 npm run serve
 ```
@@ -55,4 +55,3 @@ Firebase のプロジェクト作成やマルチプレイ設定、Firebase Hosti
 
 - Hiroki Tabei（[@tabei-hiroki](https://github.com/tabei-hiroki)）
 - 本プロジェクトは個人用途およびセルフホスト用に公開しています。
-
