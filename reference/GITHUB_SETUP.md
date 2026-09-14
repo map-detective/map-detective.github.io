@@ -26,6 +26,9 @@ GeoGuess クローン「map-detective」をGitHub Pagesでホスティングす�
 |Repositry secretのキー|値|
 |:--|:--|
 |FIREBASE_ALLOWED_DOMAIN|ルームを作成できる Google アカウント。カンマ区切りで複数指定可（例: `@example.com`）|
+
+`FIREBASE_ALLOWED_DOMAIN` は、セキュリティルールの生成に加えて、アプリのビルド時に `VUE_APP_ALLOWED_ACCOUNTS` として渡され、ログイン直後の確認にも使われます。
+
 |FIREBASE_SERVICE_ACCOUNT|サービスアカウントの秘密鍵 JSON の中身をそのまま貼り付け|
 
 `FIREBASE_SERVICE_ACCOUNT` は、Firebase コンソールの「プロジェクトの設定 > サービスアカウント > 新しい秘密鍵を生成」で取得します。ダウンロードした JSON ファイルはリポジトリに置かず、Secret に貼り付けたら破棄してください。

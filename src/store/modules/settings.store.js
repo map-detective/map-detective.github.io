@@ -6,6 +6,10 @@ import { GAME_MODE, SCORE_MODE } from '../../constants';
 import i18n from '../../lang';
 import router from '../../router';
 import { getMaxDistanceBbox } from '../../utils';
+import {
+  getAllowedAccounts,
+  isAllowedAccount,
+} from '../../utils/allowedAccounts';
 import * as MutationTypes from '../mutation-types';
 
 export class GameSettings {
@@ -158,6 +162,11 @@ export default {
             });
           }
         );
+      }, () => {
+        // 読み取りが拒否されると成功時の処理が呼ばれず、待機したままになる
+        state.roomErrorMessage = i18n.t('DialogRoom.roomAccessDenied');
+        state.loadRoom = false;
+        state.joining = false;
       });
     },
 
@@ -262,22 +271,51 @@ export default {
 
     // ルーム作成者（ホスト）の認証状態を取得する。
     // Firebase の初期化直後は currentUser が未確定のため、確定するまで待つ。
-    getCurrentHost() {
-      return new Promise((resolve) => {
-        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+    // 許可されていないアカウントが残っていた場合は、ログイン状態を破棄して未ログイン扱いにする。
+    async getCurrentHost() {
+      const user = await new Promise((resolve) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((currentUser) => {
           unsubscribe();
-          resolve(user);
+          resolve(currentUser);
         });
       });
+
+      if (!user) return null;
+
+      const allowed = getAllowedAccounts();
+
+      // 許可一覧が未設定のビルドでは確認をスキップし、セキュリティルールに任せる
+      if (allowed.length > 0 && !isAllowedAccount(user.email, allowed)) {
+        await firebase.auth().signOut();
+        return null;
+      }
+
+      return user;
     },
 
     // ホストとして Google アカウントでログインする。
-    // 許可されたアカウントかどうかはセキュリティルール側で判定するため、ここでは確認しない。
+    // 実際のアクセス制御はセキュリティルールが担うが、許可されていないアカウントのまま
+    // 先へ進むと理由が分からないまま失敗するため、ここでも確認して打ち切る。
     async signInHost() {
+      const allowed = getAllowedAccounts();
       const provider = new firebase.auth.GoogleAuthProvider();
+
+      // hd（ホストドメイン）は指定しない。指定すると Google のログイン画面に
+      // 許可ドメインが表示されてしまうため、判定はログイン後に自前で行う。
       provider.setCustomParameters({ prompt: 'select_account' });
 
       const result = await firebase.auth().signInWithPopup(provider);
+
+      // 許可一覧が未設定のビルドでは確認をスキップし、セキュリティルールに任せる
+      if (allowed.length > 0 && !isAllowedAccount(result.user?.email, allowed)) {
+        // ログイン状態を残すと、次回以降も許可されないまま進もうとしてしまう
+        await firebase.auth().signOut();
+
+        const error = new Error('This account is not allowed to host a room.');
+        error.code = 'app/account-not-allowed';
+        throw error;
+      }
+
       return result.user;
     },
 
@@ -316,6 +354,12 @@ export default {
           ) {
             dispatch('startGame');
           }
+        }, () => {
+          // 監視が拒否されるとリスナーは解除されるため、再登録できるよう戻しておく
+          state.roomListenerAttached = false;
+          state.roomErrorMessage = i18n.t('DialogRoom.roomAccessDenied');
+          state.loadRoom = false;
+          state.joining = false;
         });
       }
     },

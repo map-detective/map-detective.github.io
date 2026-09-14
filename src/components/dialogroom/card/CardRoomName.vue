@@ -136,7 +136,10 @@ export default {
           'auth/cancelled-popup-request',
         ].includes(error?.code);
 
-        if (!cancelled) {
+        if (error?.code === 'app/account-not-allowed') {
+          // どのアカウントなら使えるのか分かるよう、他の失敗とは区別して伝える
+          this.errorMessage = this.$t('CardRoomName.hostSignInNotAllowed');
+        } else if (!cancelled) {
           this.errorMessage =
             error?.code === 'auth/popup-blocked'
               ? this.$t('CardRoomName.hostSignInPopupBlocked')

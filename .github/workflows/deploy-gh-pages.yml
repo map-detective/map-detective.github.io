@@ -46,6 +46,7 @@ jobs:
           VUE_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VUE_APP_FIREBASE_MESSAGING_SENDER_ID }}
           VUE_APP_FIREBASE_APP_ID: ${{ secrets.VUE_APP_FIREBASE_APP_ID }}
           VUE_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.VUE_APP_FIREBASE_MEASUREMENT_ID }}
+          VUE_APP_ALLOWED_ACCOUNTS: ${{ secrets.FIREBASE_ALLOWED_DOMAIN }}
         run: npm run build
 
       - name: Upload Pages Artifact

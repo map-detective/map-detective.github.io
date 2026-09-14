@@ -145,6 +145,7 @@
     "hostSignInTitle": "ホストとしてログイン",
     "hostSignInDescription": "ルームを作成するには、許可された Google アカウントでのログインが必要です。招待リンクから参加する場合、ログインは不要です。",
     "hostSignInButton": "Google アカウントでログイン",
+    "hostSignInNotAllowed": "このアカウントではルームを作成できません。許可されたアカウントでログインし直してください。",
     "hostSignInFailed": "ログインできませんでした。時間をおいて、もう一度お試しください。",
     "hostSignInPopupBlocked": "ログイン画面がブラウザにブロックされました。ポップアップを許可してから、もう一度お試しください。"
   },

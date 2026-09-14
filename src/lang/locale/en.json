@@ -145,6 +145,7 @@
     "hostSignInTitle": "Sign in as host",
     "hostSignInDescription": "Creating a room requires signing in with an allowed Google account. You do not need to sign in to join from an invitation link.",
     "hostSignInButton": "Sign in with Google",
+    "hostSignInNotAllowed": "This account cannot create a room. Please sign in with an allowed account.",
     "hostSignInFailed": "Could not sign in. Please wait a moment and try again.",
     "hostSignInPopupBlocked": "The sign-in window was blocked by your browser. Please allow pop-ups and try again."
   },
