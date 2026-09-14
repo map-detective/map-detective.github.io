@@ -92,15 +92,11 @@ jobs:
         with:
           start: npm run serve
           wait-on: 'http://localhost:8080'
-          record: true
-          group: ${{matrix.browsers}}
-          tag: ${{ github.event_name }}
           browser: ${{matrix.browsers}}
           spec: |
             tests/e2e/specs/homePage.test.js
           wait-on-timeout: 500
         env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           COMMIT_INFO_MESSAGE: ${{ github.event.pull_request.title }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -123,7 +119,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        containers: [1, 2, 3]
         browsers: [chrome]
     steps:
       - uses: actions/checkout@v4
@@ -131,14 +126,9 @@ jobs:
         with:
           start: npm run serve
           wait-on: 'http://localhost:8080'
-          record: true
-          parallel: true
-          group: ${{matrix.browsers}}
-          tag: ${{ github.event_name }}
           browser: ${{matrix.browsers}}
           wait-on-timeout: 500
         env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           COMMIT_INFO_MESSAGE: ${{ github.event.pull_request.title }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

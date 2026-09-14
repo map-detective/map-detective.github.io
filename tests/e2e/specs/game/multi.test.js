@@ -24,7 +24,7 @@ describe('Multiplayer', () => {
             },
         });
 
-        cy.get('.search-box__btns > .secondary > .v-btn__content').click();
+        cy.get('.search-box__btns > .primary > .v-btn__content').click();
 
         const card = cy.get('#card-roomname');
         card.get('.v-card__title span').contains(

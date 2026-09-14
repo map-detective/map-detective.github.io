@@ -8,7 +8,7 @@ describe('HomePage', () => {
             },
         });
 
-        cy.get('.search-box__btns .v-btn.primary').contains('Single Player');
+        cy.get('.search-box__btns .v-btn.primary').contains('With Friends');
         cy.get('#languageBtn').click();
         cy.get('#menuLanguage').contains('English');
         cy.get('#menuLanguage').contains('français');
@@ -17,10 +17,10 @@ describe('HomePage', () => {
             '#menuLanguage .v-list-item__title:contains("français")'
         ).click();
 
-        cy.get('.search-box__btns .v-btn.primary').contains('Un joueur');
+        cy.get('.search-box__btns .v-btn.primary').contains('Avec des amis');
 
         cy.get('#languageBtn').click();
         cy.get('#menuLanguage .v-list-item__title:contains("English")').click();
-        cy.get('.search-box__btns .v-btn.primary').contains('Single Player');
+        cy.get('.search-box__btns .v-btn.primary').contains('With Friends');
     });
 });

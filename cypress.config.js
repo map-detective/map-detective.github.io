@@ -1,7 +1,6 @@
 const { defineConfig } = require('cypress');
 
 module.exports = defineConfig({
-  projectId: '2fcg4n',
   fixturesFolder: 'tests/e2e/fixtures',
   screenshotsFolder: 'tests/e2e/screenshots',
   videosFolder: 'tests/e2e/videos',

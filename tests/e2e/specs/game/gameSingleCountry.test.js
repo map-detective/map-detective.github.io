@@ -1,6 +1,8 @@
 // https://docs.cypress.io/api/introduction/api.html
 
-describe('SinglePlayer', () => {
+// シングルプレイヤーは 0c53f1f（複数プレイ限定）で廃止されたため skip している。
+// 機能を復活させる場合はこの skip を外し、support/commands.js の startGame も戻すこと。
+describe.skip('SinglePlayer', () => {
     it('Play SinglePlayer Mode Country Time 10s', () => {
         cy.startGame(10, 'country', 'Albi');
 

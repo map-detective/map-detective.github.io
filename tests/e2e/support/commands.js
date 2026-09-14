@@ -45,7 +45,7 @@ Cypress.Commands.add('startGame', (time, mode, place, multiplayer) => {
         },
     });
 
-    const btnWithFriends = cy.get('.search-box__btns .v-btn.secondary');
+    const btnWithFriends = cy.get('.search-box__btns .v-btn.primary');
     btnWithFriends.contains('With Friends');
     if (multiplayer) {
         btnWithFriends.click();
@@ -62,10 +62,6 @@ Cypress.Commands.add('startGame', (time, mode, place, multiplayer) => {
             .contains('NEXT')
             .click();
     }
-
-    const btnSinglePlayer = cy.get('.search-box__btns .v-btn.primary');
-    btnSinglePlayer.contains('Single Player');
-    if (!multiplayer) btnSinglePlayer.click();
 
     const cardMap = cy.get('#card-map');
     if (place) {
