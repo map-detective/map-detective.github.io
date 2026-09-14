@@ -3,22 +3,12 @@
         <h2>{{ $tc('Home.placeVisited', nbPlaceVisits) }}</h2>
 
         <div class="search-box__btns">
-            <!-- <v-btn
-                class="search-box__btns__btn"
-                rounded
-                color="primary"
-                large
-                @click="openDialog()"
-            >
-                {{ $t('DialogRoom.singlePlayer') }}
-            </v-btn> -->
-
             <v-btn
                 class="search-box__btns__btn"
                 rounded
                 color="primary"
                 large
-                @click="openDialog(false)"
+                @click="openDialog()"
             >
                 {{ $t('DialogRoom.withFriends') }}
             </v-btn>
@@ -75,8 +65,8 @@ export default {
     methods: {
         ...mapActions(['loadHistory']),
         ...mapActions('settingsStore', ['openDialogRoom']),
-        openDialog(isSinglePlayer) {
-            this.openDialogRoom(isSinglePlayer);
+        openDialog() {
+            this.openDialogRoom();
         },
         changeDialogCustom() {
             this.dialogCustom = !this.dialogCustom;

@@ -32,21 +32,31 @@ admin.initializeApp({
 const db = admin.database();
 
 // Delete all rooms 1 day passed since it was created
+const ONE_DAY = 86400000;
+
 db.ref('/')
-    .once('value', (snapshot) => {
+    .once('value')
+    .then((snapshot) => {
+        const removals = [];
+
         snapshot.forEach((childSnapshot) => {
             if (childSnapshot.hasChild('createdAt')) {
                 const createdAt = childSnapshot.child('createdAt').val();
-                const currentDate = Date.now();
-                const difference = currentDate - createdAt;
+                const difference = Date.now() - createdAt;
 
-                if (difference > 86400000) {
+                if (difference > ONE_DAY) {
                     console.log('delete : ' + childSnapshot.key);
-                    childSnapshot.ref.remove();
+                    removals.push(childSnapshot.ref.remove());
                 }
             } else {
-                childSnapshot.ref.remove();
+                console.log('delete (no createdAt) : ' + childSnapshot.key);
+                removals.push(childSnapshot.ref.remove());
             }
+        });
+
+        // 全ての削除が完了してから終了する
+        return Promise.all(removals).then(() => {
+            console.log('deleted : ' + removals.length + ' room(s)');
         });
     })
     .then(() => {

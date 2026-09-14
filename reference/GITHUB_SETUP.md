@@ -21,6 +21,24 @@ GeoGuess クローン「map-detective」をGitHub Pagesでホスティングす�
 |VUE_APP_FIREBASE_APP_ID|appId|
 |VUE_APP_LIST_MAPS_JSON_URL|'https://maps.geoguess.games/maps.json'|
 
+さらに、Realtime Database のセキュリティルールと、ルームの自動削除のために以下を登録します。
+
+|Repositry secretのキー|値|
+|:--|:--|
+|FIREBASE_ALLOWED_DOMAIN|ルームを作成できる Google アカウント。カンマ区切りで複数指定可（例: `@example.com`）|
+|FIREBASE_SERVICE_ACCOUNT|サービスアカウントの秘密鍵 JSON の中身をそのまま貼り付け|
+
+`FIREBASE_SERVICE_ACCOUNT` は、Firebase コンソールの「プロジェクトの設定 > サービスアカウント > 新しい秘密鍵を生成」で取得します。ダウンロードした JSON ファイルはリポジトリに置かず、Secret に貼り付けたら破棄してください。
+
+これらの Secret は、以下のワークフローで使われます。
+
+|ワークフロー|内容|
+|:--|:--|
+|Deploy Database Rules|セキュリティルールを生成して Firebase に反映|
+|Clean Rooms|1 日以上経過したルームを毎日削除|
+
+詳しくは [Firebase セットアップ手順](FIREBASE_SETUP.md) を参照してください。
+
 `VUE_APP_LIST_MAPS_JSON_URL`はゲームで利用するMAPカタログデータで、'https://maps.geoguess.games/maps.json'を指定すれば良いようです（おそらく、自作も可能）。
 
 参考：[Maps json](MapsJson.md)

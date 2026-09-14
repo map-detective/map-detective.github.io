@@ -2,6 +2,7 @@
 node_modules
 /dist
 docs/
+tmp/
 
 # local env files
 .env.local
@@ -34,3 +35,6 @@ yarn-error.log*
 /tests/e2e/videos
 
 stryker-tmp
+
+# database.rules.template.json から生成されるファイル（Secret の値を含むためコミットしない）
+/database.rules.json

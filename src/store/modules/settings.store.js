@@ -1,5 +1,6 @@
 import bbox from '@turf/bbox';
 import firebase from 'firebase/app';
+import 'firebase/auth';
 import 'firebase/database';
 import { GAME_MODE, SCORE_MODE } from '../../constants';
 import i18n from '../../lang';
@@ -63,7 +64,7 @@ export default {
     isOpenDialogRoom: false,
     loadRoom: false,
     currentComponent: 'settingsMap',
-    singlePlayer: true,
+    singlePlayer: false,
 
     // ROOM
     room: null,
@@ -117,7 +118,7 @@ export default {
           (curr) => (curr || 0) + 1,
           (error, committed, counterSnap) => {
             if (error || !committed) {
-              state.roomErrorMessage = 'Failed to join the room. Please try again.';
+              state.roomErrorMessage = i18n.t('DialogRoom.roomAccessDenied');
               state.loadRoom = false;
               state.joining = false;
               return;
@@ -135,7 +136,7 @@ export default {
             // ★ 自分の仮名を書き込み（※ 同名掃除はやらない）
             state.room.child(`playerName/player${playerNumber}`).set(pickedName, (err) => {
               if (err) {
-                state.roomErrorMessage = 'Failed to join the room. Please try again.';
+                state.roomErrorMessage = i18n.t('DialogRoom.roomAccessDenied');
                 state.loadRoom = false;
                 state.joining = false;
                 return;
@@ -186,9 +187,10 @@ export default {
       state.isOpenDialogRoom = open;
     },
 
-    [MutationTypes.SETTINGS_SET_MODE_DIALOG_ROOM](state, singlePlayer) {
-      state.singlePlayer = singlePlayer;
-      state.currentComponent = singlePlayer ? 'settingsMap' : 'roomName';
+    [MutationTypes.SETTINGS_SET_MODE_DIALOG_ROOM](state) {
+      // シングルプレイは廃止。常にルーム作成フローへ進む
+      state.singlePlayer = false;
+      state.currentComponent = 'roomName';
     },
 
     [MutationTypes.SETTINGS_SET_STEP_DIALOG_ROOM](state, step) {
@@ -258,8 +260,29 @@ export default {
       commit(MutationTypes.SETTINGS_RESET);
     },
 
-    openDialogRoom({ commit }, isSinglePlayer = true) {
-      commit(MutationTypes.SETTINGS_SET_MODE_DIALOG_ROOM, isSinglePlayer);
+    // ルーム作成者（ホスト）の認証状態を取得する。
+    // Firebase の初期化直後は currentUser が未確定のため、確定するまで待つ。
+    getCurrentHost() {
+      return new Promise((resolve) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+          unsubscribe();
+          resolve(user);
+        });
+      });
+    },
+
+    // ホストとして Google アカウントでログインする。
+    // 許可されたアカウントかどうかはセキュリティルール側で判定するため、ここでは確認しない。
+    async signInHost() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      const result = await firebase.auth().signInWithPopup(provider);
+      return result.user;
+    },
+
+    openDialogRoom({ commit }) {
+      commit(MutationTypes.SETTINGS_SET_MODE_DIALOG_ROOM, false);
       commit(MutationTypes.SETTINGS_SET_OPEN_DIALOG_ROOM, true);
     },
 
@@ -297,7 +320,7 @@ export default {
       }
     },
 
-    setSettings({ commit, state, rootState, dispatch }) {
+    setSettings({ commit, state, rootState }) {
       let difficulty = 2000;
       let bboxObj;
 
@@ -309,33 +332,28 @@ export default {
 
       commit(MutationTypes.SETTINGS_SET_DIFFICULTY, difficulty);
 
+      // シングルプレイは廃止したため、ルームが無い状態ではゲームを開始しない
       if (!state.room) {
-        router.push({
-          name: 'street-view',
-          params: {
-            ...state.gameSettings,
-            difficulty,
-            placeGeoJson: rootState.homeStore.map?.geojson,
-            bboxObj,
-            ...(rootState.homeStore.map ? { mapDetails: rootState.homeStore.map.details } : undefined),
-          },
-        });
-        dispatch('closeDialogRoom');
-      } else {
-        state.room.update(
-          {
-            ...state.gameSettings,
-            timeLimitation: state.gameSettings.time,
-            difficulty,
-            ...(bboxObj && { bboxObj }),
-          },
-          (error) => {
-            if (!error) {
-              commit(MutationTypes.SETTINGS_SET_STEP_DIALOG_ROOM, 'playerName');
-            }
-          }
+        commit(
+          MutationTypes.SETTINGS_SET_ROOM_ERROR,
+          i18n.t('DialogRoom.invalidRoomName')
         );
+        return;
       }
+
+      state.room.update(
+        {
+          ...state.gameSettings,
+          timeLimitation: state.gameSettings.time,
+          difficulty,
+          ...(bboxObj && { bboxObj }),
+        },
+        (error) => {
+          if (!error) {
+            commit(MutationTypes.SETTINGS_SET_STEP_DIALOG_ROOM, 'playerName');
+          }
+        }
+      );
     },
 
     // 名前セット（バリデーション + 重複名チェック）

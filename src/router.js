@@ -3,7 +3,6 @@ import Home from '@/pages/Home';
 import MedalsPage from '@/pages/MedalsPage';
 import Vue from 'vue';
 import Router from 'vue-router';
-import { GAME_MODE } from './constants';
 
 const StreetView = () => import('@/pages/StreetView');
 
@@ -36,11 +35,6 @@ export default new Router({
             }),
         },
         {
-            path: '/game/:partyParams',
-            name: 'party',
-            component: Home,
-        },
-        {
             path: '/room/:roomName',
             name: 'Room',
             component: Home,
@@ -54,35 +48,6 @@ export default new Router({
             path: '/medals',
             name: 'Medals',
             component: MedalsPage,
-        },
-        {
-            path: '/street-view/:modeSelected/:time',
-            name: 'street-view',
-            component: StreetView,
-            props: (route) => ({
-                multiplayer: false,
-                ...route.params,
-                time: parseInt(route.params.time, 10),
-                nbRoundSelected: route.params.nbRoundSelected ? parseInt(route.params.nbRoundSelected, 10) : 5,
-            }),
-            beforeEnter: (to, from, next) => {
-                let enterGame = true;
-                if (
-                    !Object.values(GAME_MODE).includes(to.params.modeSelected)
-                ) {
-                    enterGame = false;
-                }
-
-                if (isNaN(to.params.time) || to.params.time < 0) {
-                    enterGame = false;
-                }
-
-                if (enterGame) {
-                    next();
-                } else {
-                    next('/');
-                }
-            },
         },
         {
             path: '/street-view/with-friends/:roomName',

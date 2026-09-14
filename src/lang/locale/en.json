@@ -137,10 +137,16 @@
     "invalidRoomName": "Invalid name. Please try another.",
     "inProgress": "The first player is creating the room right now. Please wait and try again.",
     "roomIsFull": "This room is already full. Please try another.",
-    "alreadyStarted": "This room has already started.  Please try another."
+    "alreadyStarted": "This room has already started.  Please try another.",
+    "roomAccessDenied": "Could not enter the room. Only allowed accounts can create a room."
   },
   "CardRoomName": {
-    "title": "Type a room name to create a new room or join a existing room"
+    "title": "Type a room name to create a new room or join a existing room",
+    "hostSignInTitle": "Sign in as host",
+    "hostSignInDescription": "Creating a room requires signing in with an allowed Google account. You do not need to sign in to join from an invitation link.",
+    "hostSignInButton": "Sign in with Google",
+    "hostSignInFailed": "Could not sign in. Please wait a moment and try again.",
+    "hostSignInPopupBlocked": "The sign-in window was blocked by your browser. Please allow pop-ups and try again."
   },
   "CardRoomPlayerName": {
     "title": "Room:",

@@ -24,7 +24,6 @@
 <script>
 import SearchBox from '@/components/home/SearchBox';
 import ContentPage from '@/components/page/ContentPage';
-import { GAME_MODE } from '../constants';
 export default {
     components: {
         ContentPage,
@@ -32,34 +31,6 @@ export default {
     },
     props: {
         dialogCustomOpen: Boolean,
-    },
-    mounted() {
-        if (this.$route.params && this.$route.params.partyParams) {
-            const params = atob(this.$route.params.partyParams)
-                .split(',')
-                .map((val) => parseFloat(val));
-
-            if (params.length >= 12 && params.length % 2 === 0) {
-                const difficulty = params[0];
-                const timeLimitation = params[1];
-                const rounds = new Array((params.length - 2) / 2)
-                    .fill(0)
-                    .map((_, round) => {
-                        const index = (round + 1) * 2;
-                        return params.slice(index, index + 2);
-                    });
-
-                this.$router.push({
-                    name: 'street-view',
-                    params: {
-                        modeSelected: GAME_MODE.CLASSIC,
-                        time: timeLimitation,
-                        difficulty: difficulty,
-                        roundsPredefined: rounds,
-                    },
-                });
-            }
-        }
     },
 };
 </script>

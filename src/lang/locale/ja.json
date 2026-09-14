@@ -137,10 +137,16 @@
     "invalidRoomName": "無効な名前です。別の名前を入力して下さい。",
     "inProgress": "最初のプレーヤーが部屋を作っています。再度試して下さい。",
     "roomIsFull": "この部屋は既に満員です。",
-    "alreadyStarted": "この部屋名は既に使われています。別の部屋をお試しください。"
+    "alreadyStarted": "この部屋名は既に使われています。別の部屋をお試しください。",
+    "roomAccessDenied": "ルームに入れませんでした。ルームを作成できるのは、許可されたアカウントのみです。"
   },
   "CardRoomName": {
-    "title": "部屋の名前を入れて、新しく作るか 参加してください"
+    "title": "部屋の名前を入れて、新しく作るか 参加してください",
+    "hostSignInTitle": "ホストとしてログイン",
+    "hostSignInDescription": "ルームを作成するには、許可された Google アカウントでのログインが必要です。招待リンクから参加する場合、ログインは不要です。",
+    "hostSignInButton": "Google アカウントでログイン",
+    "hostSignInFailed": "ログインできませんでした。時間をおいて、もう一度お試しください。",
+    "hostSignInPopupBlocked": "ログイン画面がブラウザにブロックされました。ポップアップを許可してから、もう一度お試しください。"
   },
   "CardRoomPlayerName": {
     "title": "Room:",

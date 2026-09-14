@@ -30,10 +30,6 @@
                 </v-btn>
 
                 <v-spacer />
-                <v-btn color="primary" @click="onClickSinglePlayer">
-                    {{ $t('DialogRoom.singlePlayer') }}
-                </v-btn>
-
                 <v-btn color="secondary" dark @click="onClickMultiPlayer">
                     {{ $t('DialogRoom.withFriends') }}
                 </v-btn>
@@ -77,13 +73,9 @@ export default {
             }
             this.visible = false;
         },
-        onClickSinglePlayer() {
-            this.setMap();
-            this.openDialogRoom(true);
-        },
         onClickMultiPlayer() {
             this.setMap();
-            this.openDialogRoom(false);
+            this.openDialogRoom();
         },
     },
 };

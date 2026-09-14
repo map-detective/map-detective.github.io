@@ -1,0 +1,53 @@
+name: Deploy Database Rules
+
+# セキュリティルールは Secret の値を埋め込んで生成するため、
+# リポジトリにはテンプレートのみを置き、デプロイ時に組み立てる。
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'database.rules.template.json'
+      - 'scripts/build-database-rules.js'
+      - 'firebase.json'
+      - '.github/workflows/deploy-database-rules.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "database-rules"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.14'
+
+      - name: Generate database.rules.json
+        env:
+          FIREBASE_ALLOWED_DOMAIN: ${{ secrets.FIREBASE_ALLOWED_DOMAIN }}
+        run: node scripts/build-database-rules.js
+
+      - name: Write service account key
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/service-account.json"
+
+      - name: Deploy rules
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/service-account.json
+          FIREBASE_PROJECT_ID: ${{ secrets.VUE_APP_FIREBASE_PROJECT_ID }}
+        run: npx --yes firebase-tools@13 deploy --only database --project "$FIREBASE_PROJECT_ID" --non-interactive
+
+      - name: Remove service account key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/service-account.json"

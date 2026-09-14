@@ -1,0 +1,46 @@
+name: Clean Rooms
+
+# 遊び終わった／放置されたルームが Realtime Database に残り続けるため、
+# 作成から 1 日以上経過したルームを毎日削除する。
+on:
+  schedule:
+    # 毎日 04:00 (JST) = 19:00 (UTC)
+    - cron: '0 19 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "clean-rooms"
+  cancel-in-progress: false
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.14'
+
+      - name: Install dependencies
+        working-directory: scripts
+        run: npm ci
+
+      - name: Write service account key
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/service-account.json"
+
+      - name: Delete expired rooms
+        env:
+          DATABASE_URL: ${{ secrets.VUE_APP_FIREBASE_DATABASE_URL }}
+        run: node scripts/clean-rooms.js -f "$RUNNER_TEMP/service-account.json" -d "$DATABASE_URL"
+
+      - name: Remove service account key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/service-account.json"
