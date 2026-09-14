@@ -126,6 +126,9 @@ export default {
         this.needsSignIn = false;
         this.createRoom();
       } catch (error) {
+        // 設定漏れなどの切り分けができるよう、原因を必ず記録する
+        console.error('[signInHost]', error?.code, error?.message, error);
+
         // 利用者が自分でポップアップを閉じた場合はエラー表示しない
         const cancelled = [
           'auth/popup-closed-by-user',
