@@ -58,20 +58,11 @@ describe('HomeCardDialog.vue', () => {
             },
         });
         wrapper.setData({ visible: true });
-        wrapper.vm.onClickSinglePlayer();
+        wrapper.vm.onClickMultiPlayer();
 
         expect(wrapper.vm.visible).toEqual(false);
         expect(actions.openDialogRoom).toBeCalled();
         expect(loadMap).toBeCalledWith(expect.anything(), map);
-
-        wrapper.setData({ visible: true });
-        wrapper.vm.onClickMultiPlayer();
-
-        expect(wrapper.vm.visible).toEqual(false);
-
-        expect(actions.openDialogRoom).toBeCalled();
-
-        expect(loadMap).toBeCalledTimes(2);
-
+        expect(loadMap).toBeCalledTimes(1);
     });
 });

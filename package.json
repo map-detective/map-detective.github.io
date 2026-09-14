@@ -1,7 +1,7 @@
 {
     "name": "map-detective",
     "version": "1.3.1",
-    "description": "GeoGuess is an open-source geography game with Google Map StreetView.",
+    "description": "GeoGuess をベースにした、Google ストリートビューで遊ぶマルチプレイ専用の地理推測ゲーム。",
     "author": "Bilel Jegham and others",
     "scripts": {
         "serve": "vue-cli-service serve",
@@ -71,9 +71,9 @@
         "last 2 versions"
     ],
     "bugs": {
-        "url": "https://github.com/GeoGuess/Geoguess/issues"
+        "url": "https://github.com/map-detective/map-detective.github.io/issues"
     },
-    "homepage": "https://github.com/GeoGuess/Geoguess#readme",
+    "homepage": "https://github.com/map-detective/map-detective.github.io#readme",
     "keywords": [
         "game",
         "geography",
@@ -84,6 +84,6 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/GeoGuess/GeoGuess.git"
+        "url": "git+https://github.com/map-detective/map-detective.github.io.git"
     }
 }

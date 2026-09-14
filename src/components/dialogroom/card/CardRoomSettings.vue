@@ -133,7 +133,6 @@
                             />
                             <v-checkbox
                                 class="mt-2"
-                                v-if="!singlePlayer"
                                 :input-value="gameSettings.scoreLeaderboard"
                                 @change="
                                     (scoreLeaderboard) =>
@@ -145,7 +144,6 @@
                                 hide-details
                             />
                             <v-checkbox
-                                v-if="!singlePlayer"
                                 :input-value="gameSettings.guessedLeaderboard"
                                 @change="
                                     (guessedLeaderboard) =>
@@ -160,7 +158,6 @@
                         </v-col>
                         <v-col>
                             <v-text-field
-                                v-if="!singlePlayer"
                                 :label="$t('CardRoomSettings.countDownLabel')"
                                 :value="gameSettings.countdown"
                                 @input="
@@ -175,7 +172,7 @@
                             <div
                                 v-if="
                                     gameSettings.modeSelected !==
-                                        gameMode.CLASSIC && !singlePlayer
+                                        gameMode.CLASSIC
                                 "
                             >
                                 <v-checkbox
@@ -311,7 +308,6 @@ export default {
         TimePicker,
     },
     mixins: [CardRoomMixin],
-    props: ['singlePlayer'],
     data() {
         return {
             invalidAreas: false,

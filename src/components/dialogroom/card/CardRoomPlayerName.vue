@@ -1,81 +1,85 @@
 <!-- CardRoomPlayerName.vue -->
 <template>
-  <v-card id="card-playername">
-    <v-card-title>
-      <span id="card-title">
-        {{ $t('CardRoomPlayerName.title') }}
-        <span :class="{ blur: streamerMode }">{{ resolvedRoomId }}</span>
-      </span>
-    </v-card-title>
+    <v-card id="card-playername">
+        <v-card-title>
+            <span id="card-title">
+                {{ $t('CardRoomPlayerName.title') }}
+                <span :class="{ blur: streamerMode }">{{
+                    resolvedRoomId
+                }}</span>
+            </span>
+        </v-card-title>
 
-    <v-card-subtitle ref="roomUrl" class="pb-0">
-      <span :class="{ blur: streamerMode }">{{ roomUrl }} </span>
-      <v-icon small @click="copy"> mdi-content-copy </v-icon>
-    </v-card-subtitle>
+        <v-card-subtitle ref="roomUrl" class="pb-0">
+            <span :class="{ blur: streamerMode }">{{ roomUrl }} </span>
+            <v-icon small @click="copy"> mdi-content-copy </v-icon>
+        </v-card-subtitle>
 
-    <v-card-text>
-      <v-container>
-        <v-row>
-          <v-col cols="12">
-            <v-text-field
-              id="inputPlayerName"
-              :value="localName"
-              @input="onInput"
-              @compositionstart="isComposing = true"
-              @compositionend="onCompositionEnd"
-              maxlength="20"
-              autofocus
-              :label="$t('CardRoomPlayerName.input')"
-              :error="invalidName"
-              :error-messages="invalidName ? [$t('CardRoomPlayerName.invalidHint') || '日本語・英数字・_・- のみ（1〜20文字）'] : []"
-            />
-          </v-col>
-        </v-row>
+        <v-card-text>
+            <v-container>
+                <v-row>
+                    <v-col cols="12">
+                        <v-text-field
+                            id="inputPlayerName"
+                            :value="localName"
+                            @input="onInput"
+                            @compositionstart="isComposing = true"
+                            @compositionend="onCompositionEnd"
+                            maxlength="20"
+                            autofocus
+                            :label="$t('CardRoomPlayerName.input')"
+                            :error="invalidName"
+                            :error-messages="errorMessages"
+                        />
+                    </v-col>
+                </v-row>
 
-        <h3>{{ $tc('CardRoomPlayerName.players', players.length) }}</h3>
-        <v-chip-group column>
-          <v-chip
-            v-for="(pname, i) in players"
-            :key="'player' + i"
-            color="#424242"
-            dark
-          >
-            <v-avatar
-              :color="[
-                '#E91B0C',
-                '#5ccc00',
-                '#e0ca00',
-                '#FF1F69',
-                '#00b8b8'
-              ][i % 5]"
-              left
+                <h3>{{ $tc('CardRoomPlayerName.players', players.length) }}</h3>
+                <v-chip-group column>
+                    <v-chip
+                        v-for="(pname, i) in players"
+                        :key="'player' + i"
+                        color="#424242"
+                        dark
+                    >
+                        <v-avatar
+                            :color="
+                                [
+                                    '#E91B0C',
+                                    '#5ccc00',
+                                    '#e0ca00',
+                                    '#FF1F69',
+                                    '#00b8b8',
+                                ][i % 5]
+                            "
+                            left
+                        >
+                            {{ (pname || '').slice(0, 2).toUpperCase() }}
+                        </v-avatar>
+                        {{ pname }}
+                    </v-chip>
+                </v-chip-group>
+            </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+            <div class="flex-grow-1" />
+            <v-btn dark depressed color="error" @click="cancel">
+                {{ $t('cancel') }}
+            </v-btn>
+            <v-btn
+                v-if="playerNumber === 1"
+                id="btnStart"
+                dark
+                depressed
+                color="#43B581"
+                :disabled="players.length < 2 || !canNext"
+                @click="startGame"
             >
-              {{ (pname || '').slice(0, 2).toUpperCase() }}
-            </v-avatar>
-            {{ pname }}
-          </v-chip>
-        </v-chip-group>
-      </v-container>
-    </v-card-text>
-
-    <v-card-actions>
-      <div class="flex-grow-1" />
-      <v-btn dark depressed color="error" @click="cancel">
-        {{ $t('cancel') }}
-      </v-btn>
-      <v-btn
-        v-if="playerNumber === 1"
-        id="btnStart"
-        dark
-        depressed
-        color="#43B581"
-        :disabled="players.length < 2 || !canNext"
-        @click="startGame"
-      >
-        {{ $t('next') }}
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+                {{ $t('next') }}
+            </v-btn>
+        </v-card-actions>
+    </v-card>
 </template>
 
 <script>
@@ -83,96 +87,101 @@ import { mapState, mapActions } from 'vuex';
 import CardRoomMixin from './mixins/CardRoomMixin';
 
 export default {
-  name: 'CardRoomPlayerName',
-  mixins: [CardRoomMixin],
+    name: 'CardRoomPlayerName',
+    mixins: [CardRoomMixin],
 
-  data() {
-    return {
-      isComposing: false,
-      localName: this.name ?? '',
-    };
-  },
-
-  computed: {
-    ...mapState('settingsStore', [
-      'playerNumber',
-      'roomName',
-      'players',
-      'name',
-      'invalidName',
-    ]),
-    ...mapState({
-      streamerMode: (state) => state.homeStore.streamerMode,
-    }),
-
-    // ルートのパラメータを最優先で使用（/room/:roomId など）
-    resolvedRoomId() {
-      const p = this.$route?.params || {};
-      return p.roomId || p.id || p.roomName || this.roomName || '';
+    data() {
+        return {
+            isComposing: false,
+            localName: this.name ?? '',
+        };
     },
 
-    roomUrl() {
-      return `${window.location.origin}/room/${this.resolvedRoomId}`;
+    computed: {
+        ...mapState('settingsStore', [
+            'playerNumber',
+            'roomName',
+            'players',
+            'name',
+            'invalidName',
+        ]),
+        ...mapState({
+            streamerMode: (state) => state.homeStore.streamerMode,
+        }),
+
+        // 入力が不正なときだけ、許可している文字と文字数を伝える
+        errorMessages() {
+            return this.invalidName
+                ? [this.$t('CardRoomPlayerName.invalidHint')]
+                : [];
+        },
+
+        // ルートのパラメータを最優先で使用（/room/:roomId など）
+        resolvedRoomId() {
+            const p = this.$route?.params || {};
+            return p.roomId || p.id || p.roomName || this.roomName || '';
+        },
+
+        roomUrl() {
+            return `${window.location.origin}/room/${this.resolvedRoomId}`;
+        },
+
+        // 次へ行ける条件を少し厳密に（空要素なし + 自分の名前が有効）
+        canNext() {
+            const anyEmpty = this.players.some((n) => n === '');
+            const myOk = !!this.name && !this.invalidName;
+            return !anyEmpty && myOk;
+        },
     },
 
-    // 次へ行ける条件を少し厳密に（空要素なし + 自分の名前が有効）
-    canNext() {
-      const anyEmpty = this.players.some((n) => n === '');
-      const myOk = !!this.name && !this.invalidName;
-      return !anyEmpty && myOk;
-    },
-  },
-
-  watch: {
-    // 外部更新が来た場合に、変換中でなければ同期
-    name(n) {
-      if (!this.isComposing) this.localName = n ?? '';
-    },
-  },
-
-  methods: {
-    ...mapActions('settingsStore', ['startGame', 'setPlayerName']),
-
-    onInput(val) {
-      // Vuetify v-text-field の input は value を直接渡す
-      this.localName = val;
-      if (this.isComposing) return; // 変換中は store を触らない
-      this.pushToStore(val);
+    watch: {
+        // 外部更新が来た場合に、変換中でなければ同期
+        name(n) {
+            if (!this.isComposing) this.localName = n ?? '';
+        },
     },
 
-    onCompositionEnd(e) {
-      this.isComposing = false;
-      const val = e?.target?.value ?? this.localName;
-      this.localName = val;
-      this.pushToStore(val); // 確定した文字列を反映
-    },
+    methods: {
+        ...mapActions('settingsStore', ['startGame', 'setPlayerName']),
 
-    pushToStore(val) {
-      // 必要なら確定後にのみ正規化を行う（例: NFC）
-      // const normalized = val.normalize('NFC');
-      // this.setPlayerName(normalized);
-      this.setPlayerName(val);
-    },
+        onInput(val) {
+            // Vuetify v-text-field の input は value を直接渡す
+            this.localName = val;
+            if (this.isComposing) return; // 変換中は store を触らない
+            this.pushToStore(val);
+        },
 
-    copy() {
-      this.$copyText(this.roomUrl, this.$refs.roomUrl);
+        onCompositionEnd(e) {
+            this.isComposing = false;
+            const val = e?.target?.value ?? this.localName;
+            this.localName = val;
+            this.pushToStore(val); // 確定した文字列を反映
+        },
+
+        // 正規化と検証はストア側（setPlayerName）に集約している
+        pushToStore(val) {
+            this.setPlayerName(val);
+        },
+
+        copy() {
+            this.$copyText(this.roomUrl, this.$refs.roomUrl);
+        },
     },
-  },
 };
 </script>
 
 <style scoped>
 #card-title {
-  font-size: 16px;
-  font-weight: 500;
-  opacity: 0.9;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0.9;
 }
 h3 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  font-weight: 500;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
 }
 .blur {
-  filter: blur(6px);
+    filter: blur(6px);
 }
 </style>

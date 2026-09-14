@@ -8,7 +8,6 @@
     >
         <component
             :is="currentComponent"
-            :single-player="singlePlayer"
             :current-component="currentComponent"
             :room="room"
             :room-name="roomName"
@@ -35,9 +34,6 @@ export default {
         ...mapState('settingsStore', [
             'isOpenDialogRoom',
             'currentComponent',
-            'singlePlayer',
-            'loadingGeoJson',
-            'placeGeoJson',
             'room',
             'roomName',
         ]),
@@ -60,7 +56,7 @@ export default {
 <style lang="scss">
 .dialog-room {
     .v-card__actions {
-        gap: .5rem;
+        gap: 0.5rem;
         padding: 1rem;
     }
 }

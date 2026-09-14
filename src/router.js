@@ -57,8 +57,8 @@ export default new Router({
                 multiplayer: true,
                 ...route.params,
                 nbRoundSelected: route.params.nbRoundSelected
-                ? parseInt(route.params.nbRoundSelected, 10)
-                : 5,
+                    ? parseInt(route.params.nbRoundSelected, 10)
+                    : 5,
             }),
             // 任意：無効IDを弾く保険
             beforeEnter: (to, from, next) => {
