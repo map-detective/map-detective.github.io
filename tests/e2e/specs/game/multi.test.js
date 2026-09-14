@@ -1,6 +1,17 @@
 // https://docs.cypress.io/api/introduction/api.html
 
-describe('Multiplayer', () => {
+// マルチプレイは 2a1f53b〜a418118 でルーム作成フローが作り直されたため skip している。
+// このテストが前提にしている以下の仕様は、いずれも現在は存在しない。
+//   - ルーム名の入力欄（#inputRoomName）… ルーム名は CardRoomName.vue が自動発行する
+//   - ホーム画面からルーム名を入力して既存ルームへ参加する導線
+//     … 参加は招待URL /room/:roomName 経由のみ
+// さらに、復活させるには以下の2点を回避する仕組みが必要になる。
+//   - ルーム作成に signInHost の Google ログイン（signInWithPopup）が必須
+//   - Realtime Database のルールにより、未認証では新規ルームを作成できないため
+//     support/commands.js の createRoom / addPlayer が書き込めない
+// Firebase Auth Emulator かカスタムトークンでホストのログインを差し替えたうえで、
+// 招待URL経由の参加を検証する形に書き直すこと。
+describe.skip('Multiplayer', () => {
     it('Create Multiplayer', () => {
         const id = Date.now().toString().slice(-5);
 

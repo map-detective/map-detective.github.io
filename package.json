@@ -1,6 +1,6 @@
 {
     "name": "map-detective",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "description": "GeoGuess をベースにした、Google ストリートビューで遊ぶマルチプレイ専用の地理推測ゲーム。",
     "author": "Bilel Jegham and others",
     "scripts": {
