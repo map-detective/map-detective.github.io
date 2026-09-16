@@ -172,8 +172,6 @@
 </template>
 
 <script>
-import firebase from 'firebase/app';
-import 'firebase/database';
 
 import DialogSummary from '@/components/DialogSummary';
 import DetailsMap from '@/components/game/DetailsMap';
@@ -181,6 +179,7 @@ import Map from '@/components/map/Map';
 import MapAreas from '@/components/map/MapAreas';
 import { GAME_MODE } from '../constants';
 import { getSelectedPos } from '../utils';
+import { roomRef } from '../utils/room';
 import { getScore } from '../utils/game/score';
 import Leaderboard from "@/components/game/Leaderboard.vue";
 
@@ -272,7 +271,7 @@ export default {
         let size = 0;
 
         if (this.roomName) {
-            this.room = firebase.database().ref(this.roomName);
+            this.room = roomRef(this.roomName);
 
             this.room.on('value', (snapshot) => {
                 if (snapshot.hasChild('active')) {

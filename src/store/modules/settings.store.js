@@ -6,6 +6,7 @@ import { GAME_MODE, SCORE_MODE } from '../../constants';
 import i18n from '../../lang';
 import router from '../../router';
 import { getMaxDistanceBbox } from '../../utils';
+import { roomRef } from '../../utils/room';
 import {
     getAllowedAccounts,
     isAllowedAccount,
@@ -100,7 +101,7 @@ export default {
             if (state.joined || state.joining) return;
 
             state.joining = true;
-            state.room = firebase.database().ref(roomName);
+            state.room = roomRef(roomName);
             state.roomName = roomName;
 
             // Open Modal

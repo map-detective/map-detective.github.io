@@ -3,23 +3,24 @@
     ".read": false,
     ".write": false,
 
-    "$room": {
-      ".read": true,
-      ".write": "data.exists() || (__HOST_CONDITION__)",
-      ".validate": "$room.matches(/^[a-zA-Z0-9_-]{4,64}$/)",
+    "rooms": {
+      "$room": {
+        ".read": "$room.matches(/^[a-zA-Z0-9_-]{20,64}$/)",
+        ".write": "$room.matches(/^[a-zA-Z0-9_-]{20,64}$/) && (data.exists() || (__HOST_CONDITION__))",
 
-      "playerName": {
-        "$player": {
-          ".validate": "newData.isString() && newData.val().length <= 30"
+        "playerName": {
+          "$player": {
+            ".validate": "newData.isString() && newData.val().length <= 30"
+          }
+        },
+
+        "playersCounter": {
+          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
+        },
+
+        "size": {
+          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
         }
-      },
-
-      "playersCounter": {
-        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
-      },
-
-      "size": {
-        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
       }
     }
   }

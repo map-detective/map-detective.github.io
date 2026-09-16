@@ -34,7 +34,7 @@ const db = admin.database();
 // Delete all rooms 1 day passed since it was created
 const ONE_DAY = 86400000;
 
-db.ref('/')
+db.ref('rooms')
     .once('value')
     .then((snapshot) => {
         const removals = [];

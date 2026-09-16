@@ -129,9 +129,6 @@
 </template>
 
 <script>
-import firebase from 'firebase/app';
-import 'firebase/database';
-
 import HeaderGame from '@/components/HeaderGame';
 import Maps from '@/components/Maps';
 import DialogMessage from '@/components/DialogMessage';
@@ -139,6 +136,7 @@ import DialogMessage from '@/components/DialogMessage';
 import StreetViewService from '@/plugins/StreetViewService';
 
 import { getRandomArea } from '../utils';
+import { roomRef } from '../utils/room';
 
 import { GAME_MODE, SCORE_MODE } from '../constants';
 
@@ -351,7 +349,7 @@ export default {
             this.isReady = true;
         } else {
             // ここからは解決済みの rid で RTDB を参照
-            this.room = firebase.database().ref(rid);
+            this.room = roomRef(rid);
 
             if (this.playerNumber === 1) {
                 await this.loadStreetView();

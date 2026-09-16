@@ -40,11 +40,7 @@
 <script>
 import { mapMutations, mapState } from 'vuex';
 import { SETTINGS_SET_ROOM_ERROR } from '@/store/mutation-types';
-
-// ルーム名は利用者に入力させず、10文字の擬似乱数で発行する
-function shortRandomId() {
-    return Math.random().toString(36).slice(2, 12);
-}
+import { generateRoomId } from '@/utils/room';
 
 // ルートから来たIDを拾う（param名はプロジェクトのrouter定義に合わせて調整）
 function getRoomIdFromRoute(vm) {
@@ -116,7 +112,7 @@ export default {
             setRoomError: SETTINGS_SET_ROOM_ERROR,
         }),
         createRoom() {
-            const pseudoName = shortRandomId();
+            const pseudoName = generateRoomId();
             this.$emit('input', pseudoName);
             this.$emit('update:roomName', pseudoName);
 
