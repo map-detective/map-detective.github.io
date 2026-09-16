@@ -240,6 +240,7 @@
                                     :label="$t('CardRoomSettings.nbRound')"
                                     :value="gameSettings.timeAttackSelected ? 10 : gameSettings.nbRoundSelected"
                                     min="1"
+                                    max="99"
                                     @input="
                                         (nbRoundSelected) =>
                                             setGameSettings({ nbRoundSelected: +nbRoundSelected })

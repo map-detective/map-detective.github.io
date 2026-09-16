@@ -8,18 +8,96 @@
         ".read": "$room.matches(/^[a-zA-Z0-9_-]{20,64}$/)",
         ".write": "$room.matches(/^[a-zA-Z0-9_-]{20,64}$/) && (data.exists() || (__HOST_CONDITION__))",
 
+        "createdAt": { ".validate": "newData.isNumber()" },
+        "playersCounter": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100" },
+        "size": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100" },
+        "started": { ".validate": "newData.isBoolean()" },
+        "active": { ".validate": "newData.isBoolean()" },
+
         "playerName": {
           "$player": {
-            ".validate": "newData.isString() && newData.val().length <= 30"
+            ".validate": "$player.matches(/^player[0-9]{1,3}$/) && newData.isString() && newData.val().length <= 30"
           }
         },
 
-        "playersCounter": {
-          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
+        "allPanorama": { ".validate": "newData.isBoolean()" },
+        "timeAttackSelected": { ".validate": "newData.isBoolean()" },
+        "zoomControl": { ".validate": "newData.isBoolean()" },
+        "moveControl": { ".validate": "newData.isBoolean()" },
+        "panControl": { ".validate": "newData.isBoolean()" },
+        "optimiseStreetView": { ".validate": "newData.isBoolean()" },
+        "scoreLeaderboard": { ".validate": "newData.isBoolean()" },
+        "guessedLeaderboard": { ".validate": "newData.isBoolean()" },
+
+        "time": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "timeLimitation": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "countdown": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "difficulty": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "nbRoundSelected": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99" },
+
+        "modeSelected": {
+          ".validate": "newData.val() == 'classic' || newData.val() == 'country' || newData.val() == 'custom_area'"
+        },
+        "scoreMode": {
+          ".validate": "newData.val() == 'normal' || newData.val() == 'time'"
         },
 
-        "size": {
-          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
+        "bboxObj": {
+          "$index": { ".validate": "$index.matches(/^[0-3]$/) && newData.isNumber()" }
+        },
+
+        "areaParams": { ".validate": true },
+
+        "streetView": {
+          "$round": {
+            ".validate": "$round.matches(/^round[0-9]{1,2}$/)",
+            "latitude": { ".validate": "newData.isNumber() && newData.val() >= -90 && newData.val() <= 90" },
+            "longitude": { ".validate": "newData.isNumber() && newData.val() >= -180 && newData.val() <= 180" },
+            "area": { ".validate": "newData.isString() && newData.val().length <= 200" },
+            "warning": { ".validate": "newData.isBoolean()" },
+            "roundInfo": { ".validate": true },
+            "$other": { ".validate": false }
+          }
+        },
+
+        "guess": {
+          "$player": {
+            ".validate": "$player.matches(/^player[0-9]{1,3}$/)",
+            "latitude": { ".validate": "newData.isNumber() && newData.val() >= -90 && newData.val() <= 90" },
+            "longitude": { ".validate": "newData.isNumber() && newData.val() >= -180 && newData.val() <= 180" },
+            "area": { ".validate": "newData.isString() && newData.val().length <= 200" },
+            "$other": { ".validate": false }
+          }
+        },
+
+        "finalScore": {
+          "$player": {
+            ".validate": "$player.matches(/^player[0-9]{1,3}$/) && newData.isNumber() && newData.val() >= 0"
+          }
+        },
+        "finalPoints": {
+          "$player": {
+            ".validate": "$player.matches(/^player[0-9]{1,3}$/) && newData.isNumber() && newData.val() >= 0"
+          }
+        },
+        "isGameDone": {
+          "$player": {
+            ".validate": "$player.matches(/^player[0-9]{1,3}$/) && newData.isBoolean()"
+          }
+        },
+
+        "$round": {
+          ".validate": "$round.matches(/^round[0-9]{1,2}$/)",
+          "$player": {
+            ".validate": "$player.matches(/^player[0-9]{1,3}$/)",
+            "latitude": { ".validate": "newData.isNumber() && newData.val() >= -90 && newData.val() <= 90" },
+            "longitude": { ".validate": "newData.isNumber() && newData.val() >= -180 && newData.val() <= 180" },
+            "area": { ".validate": "newData.isString() && newData.val().length <= 200" },
+            "distance": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+            "points": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+            "timePassed": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+            "$other": { ".validate": false }
+          }
         }
       }
     }

@@ -63,6 +63,25 @@ const PLAYER_NAME_ALLOWED_RE =
 const PLAYER_NAME_MIN = 1;
 const PLAYER_NAME_MAX = 20;
 
+/* ========= ラウンド数 ========= */
+
+// ラウンドの結果は round1, round2 … というキーで保存され、
+// セキュリティルール側で round + 1〜2 桁の数字に制限している。
+const ROUND_MIN = 1;
+const ROUND_MAX = 99;
+
+// 入力欄の max 属性ではキーボード入力を防げないため、ここで確実に丸める。
+// 範囲外の値はルールに拒否され、設定そのものが保存できなくなる。
+function clampRound(value) {
+    const round = parseInt(value, 10);
+
+    if (isNaN(round)) {
+        return ROUND_MIN;
+    }
+
+    return Math.min(Math.max(round, ROUND_MIN), ROUND_MAX);
+}
+
 export default {
     namespaced: true,
 
@@ -208,6 +227,9 @@ export default {
             }
             if (settings.areaParams) {
                 settings.modeSelected = GAME_MODE.CUSTOM_AREA;
+            }
+            if ('nbRoundSelected' in settings) {
+                settings.nbRoundSelected = clampRound(settings.nbRoundSelected);
             }
             state.gameSettings = { ...state.gameSettings, ...settings };
         },
@@ -442,12 +464,19 @@ export default {
                     ...(bboxObj && { bboxObj }),
                 },
                 (error) => {
-                    if (!error) {
+                    // 拒否されたまま黙って止まると原因が分からないため、必ず伝える
+                    if (error) {
                         commit(
-                            MutationTypes.SETTINGS_SET_STEP_DIALOG_ROOM,
-                            'playerName'
+                            MutationTypes.SETTINGS_SET_ROOM_ERROR,
+                            i18n.t('DialogRoom.settingsSaveFailed')
                         );
+                        return;
                     }
+
+                    commit(
+                        MutationTypes.SETTINGS_SET_STEP_DIALOG_ROOM,
+                        'playerName'
+                    );
                 }
             );
         },

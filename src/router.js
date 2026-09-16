@@ -3,6 +3,7 @@ import Home from '@/pages/Home';
 import MedalsPage from '@/pages/MedalsPage';
 import Vue from 'vue';
 import Router from 'vue-router';
+import { isValidRoomId } from '@/utils/room';
 
 const StreetView = () => import('@/pages/StreetView');
 
@@ -60,10 +61,12 @@ export default new Router({
                     ? parseInt(route.params.nbRoundSelected, 10)
                     : 5,
             }),
-            // 任意：無効IDを弾く保険
+            // 無効なIDはルール側でも拒否されるが、そちらは無言で失敗するため
+            // 画面に入る前に弾いて home へ戻す
             beforeEnter: (to, from, next) => {
-                const id = to.params.roomName;
-                if (!id || /[.#$[\]]/.test(id)) return next({ name: 'home' });
+                if (!isValidRoomId(to.params.roomName)) {
+                    return next({ name: 'home' });
+                }
                 next();
             },
         },

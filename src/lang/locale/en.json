@@ -138,7 +138,8 @@
     "inProgress": "The first player is creating the room right now. Please wait and try again.",
     "roomIsFull": "This room is already full. Please try another.",
     "alreadyStarted": "This room has already started.  Please try another.",
-    "roomAccessDenied": "Could not enter the room. Only allowed accounts can create a room."
+    "roomAccessDenied": "Could not enter the room. Only allowed accounts can create a room.",
+    "settingsSaveFailed": "Could not save the settings. Please check your input and try again."
   },
   "CardRoomName": {
     "title": "Type a room name to create a new room or join a existing room",

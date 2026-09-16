@@ -26,7 +26,7 @@
 | 地理計算 | `@turf/*`、`random-position-in-polygon` |
 | ローカル保存 | IndexedDB（自作マップ）、localStorage（言語設定） |
 | 多言語 | vue-i18n（17 言語。ja / en 以外は en へフォールバック） |
-| テスト | Jest + @vue/test-utils（単体）、Cypress（E2E） |
+| テスト | Jest + @vue/test-utils（単体）、Firebase Emulator（セキュリティルール） |
 
 ## ディレクトリ構成
 
@@ -251,7 +251,7 @@ database.rules.json           ← 生成物（.gitignore 対象）
 | `npm run build` | 本番ビルド（`dist/`） |
 | `npm run lint` | ESLint + Prettier |
 | `npm run test:unit` | Jest による単体テスト |
-| `npm run test:e2e` | Cypress による E2E テスト |
+| `npm run test:rules` | Realtime Database のセキュリティルールのテスト（Java 21 以上が必要。任意） |
 
 ### GitHub Pages（`deploy-gh-pages.yml`）
 

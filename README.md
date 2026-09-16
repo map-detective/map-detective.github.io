@@ -55,6 +55,7 @@ VUE_APP_ALLOWED_ACCOUNTS=@example.com
 - [GitHub Pages での設定手順](reference/GITHUB_SETUP.md)
 - [マップ一覧 JSON の書式](reference/MapsJson.md)
 - [設計・実装メモ](reference/ARCHITECTURE.md)
+- [セキュリティルールのテスト](reference/DATABASE_RULES_TEST.md)
 
 ## 🛠 技術構成
 
@@ -72,7 +73,10 @@ npm run serve      # 開発サーバー
 npm run build      # 本番ビルド
 npm run lint       # ESLint + Prettier
 npm run test:unit  # 単体テスト
+npm run test:rules # セキュリティルールのテスト（任意。Java 21 以上が必要）
 ```
+
+`npm run test:rules` は Firebase Emulator を使うため Java 21 以上を必要としますが、**実行しなくても開発・ビルド・デプロイには影響しません**。`database.rules.template.json` を変更するときだけ実行してください。詳細は [セキュリティルールのテスト](reference/DATABASE_RULES_TEST.md) を参照してください。
 
 ## 📄 ライセンス
 

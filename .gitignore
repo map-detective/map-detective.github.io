@@ -31,10 +31,10 @@ yarn-error.log*
 
 /coverage
 
-/tests/e2e/screenshots
-/tests/e2e/videos
-
 stryker-tmp
 
 # database.rules.template.json から生成されるファイル（Secret の値を含むためコミットしない）
 /database.rules.json
+
+# Firebase エミュレータが出力するログ
+/database-debug.log

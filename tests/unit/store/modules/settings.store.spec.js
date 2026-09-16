@@ -29,6 +29,32 @@ describe('settingsStore.js', () => {
 
     });
 
+    it('SETTINGS_SET_GAME_SETTINGS clamps nbRoundSelected', ()=>{
+        let state = {gameSettings: new GameSettings()};
+        const setRound = (nbRoundSelected) =>
+            settingsStore.mutations[MutationTypes.SETTINGS_SET_GAME_SETTINGS](
+                state,
+                {nbRoundSelected}
+            );
+
+        setRound(10);
+        expect(state.gameSettings.nbRoundSelected).toEqual(10);
+
+        // セキュリティルールが受け付ける上限を超えた値は丸める
+        setRound(100);
+        expect(state.gameSettings.nbRoundSelected).toEqual(99);
+
+        setRound(0);
+        expect(state.gameSettings.nbRoundSelected).toEqual(1);
+
+        // 入力欄を空にすると NaN が渡る
+        setRound(NaN);
+        expect(state.gameSettings.nbRoundSelected).toEqual(1);
+
+        setRound('42');
+        expect(state.gameSettings.nbRoundSelected).toEqual(42);
+    });
+
     it('setPlayerName will commit playerName', ()=>{
         const commit = jest.fn();
         const state = { players: [], name: '' };
