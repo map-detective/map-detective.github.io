@@ -308,6 +308,11 @@ describe('ゲームの流れ', () => {
         // ラウンドが終わったら回答を消す
         expect(await remove(`${roomPath()}/guess`, ANONYMOUS)).toBe(ALLOWED);
 
+        // 2 人目以降は trigger を書いて次のラウンドを知らせる
+        expect(
+            await write(`${roomPath()}/trigger/player2`, 2, ANONYMOUS)
+        ).toBe(ALLOWED);
+
         // 最終スコア
         expect(
             await write(`${roomPath()}/finalScore/player1`, 13896482, ANONYMOUS)
@@ -416,6 +421,15 @@ describe('スキーマの固定', () => {
             await write(`${roomPath()}/playerName/player1000`, 'Toto', ANONYMOUS)
         ).toBe(DENIED);
     });
+
+    test('trigger のキーは player + 数字', async () => {
+        expect(await write(`${roomPath()}/trigger/admin`, 2, ANONYMOUS)).toBe(
+            DENIED
+        );
+        expect(
+            await write(`${roomPath()}/trigger/player1000`, 2, ANONYMOUS)
+        ).toBe(DENIED);
+    });
 });
 
 describe('値の型と範囲', () => {
@@ -498,6 +512,21 @@ describe('値の型と範囲', () => {
         ).toBe(DENIED);
         expect(
             await write(`${roomPath()}/round1/player1/distance`, -1, ANONYMOUS)
+        ).toBe(DENIED);
+    });
+
+    test('trigger はラウンド名と同じ 1〜99 の数値', async () => {
+        expect(await write(`${roomPath()}/trigger/player2`, 99, ANONYMOUS)).toBe(
+            ALLOWED
+        );
+        expect(
+            await write(`${roomPath()}/trigger/player2`, 100, ANONYMOUS)
+        ).toBe(DENIED);
+        expect(await write(`${roomPath()}/trigger/player2`, 0, ANONYMOUS)).toBe(
+            DENIED
+        );
+        expect(
+            await write(`${roomPath()}/trigger/player2`, 'next', ANONYMOUS)
         ).toBe(DENIED);
     });
 });

@@ -85,6 +85,11 @@
             ".validate": "$player.matches(/^player[0-9]{1,3}$/) && newData.isBoolean()"
           }
         },
+        "trigger": {
+          "$player": {
+            ".validate": "$player.matches(/^player[0-9]{1,3}$/) && newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+          }
+        },
 
         "$round": {
           ".validate": "$round.matches(/^round[0-9]{1,2}$/)",
