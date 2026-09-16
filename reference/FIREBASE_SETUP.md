@@ -152,16 +152,24 @@ const firebaseConfig = {
   appId: "1:241341655400:web:3caxxx5c858d3ecb084edd"
 };
 
+Firebaseの管理画面で取得できる値との対応付けは以下の通りです。
 
-```env
-VUE_APP_FIREBASE_API_KEY=`apiKey`
-VUE_APP_FIREBASE_AUTH_DOMAIN=`authDomain`
-VUE_APP_FIREBASE_PROJECT_ID=`projectId`
-VUE_APP_FIREBASE_DATABASE_URL=https://your-project-id.firebaseio.com
-VUE_APP_STORAGE_BUCKET=`storageBucket`
-VUE_APP_FIREBASE_MESSAGING_SENDER_ID=`messagingSenderId`
-VUE_APP_FIREBASE_APP_ID=`appId`
-VUE_APP_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX （Google Analyticsのコード。使用しないのであれば空欄でOK）
+```js
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "VUE_APP_FIREBASE_API_KEY",
+  authDomain: "VUE_APP_FIREBASE_AUTH_DOMAIN",
+  databaseURL: "VUE_APP_FIREBASE_DATABASE_URL",
+  projectId: "VUE_APP_FIREBASE_PROJECT_ID",
+  storageBucket: "VUE_APP_STORAGE_BUCKET",
+  messagingSenderId: "VUE_APP_FIREBASE_MESSAGING_SENDER_ID",
+  appId: "VUE_APP_FIREBASE_APP_ID"
+};
+```
+
+以下のキーには、Google Analyticsのコードをセットしますが、使用しないのであれば空欄でOKです。
+```js
+VUE_APP_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
 Google Maps の API キー（`VUE_APP_API_KEY`）と、ルーム作成を許可するアカウント
