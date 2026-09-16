@@ -13,25 +13,42 @@
 
 1. [Firebase Console](https://console.firebase.google.com/) にアクセスし、新しいプロジェクトを作成。
 2. 「プロジェクト名」を入力し、Google Analytics は任意で設定。
-3. プロジェクト作成後、下記を控える（`.env` に記載するため）:
-    - `VUE_APP_FIREBASE_API_KEY`
-    - `VUE_APP_FIREBASE_AUTH_DOMAIN`
-    - `VUE_APP_FIREBASE_PROJECT_ID`
-    - `VUE_APP_FIREBASE_DATABASE_URL`
-    - `VUE_APP_STORAGE_BUCKET`
-    - `VUE_APP_FIREBASE_MESSAGING_SENDER_ID`
-    - `VUE_APP_FIREBASE_APP_ID`
-    - `VUE_APP_FIREBASE_MEASUREMENT_ID`（Google Analytics を使用しないので空欄でOK）
+3. プロジェクトの作成後「設定 > 全般 > マイアプリ」からウェブアプリを作成し登録（Firebase Hostingの設定は不要）
+4. Firebase SDKの追加に表示される以下のコードの部分をコピーする（npm / scriptどっちでもOK）　　
+```js
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCQdm5QKV0Fxxxxxxxxz4ifIGLdnpNkFmDI",
+  authDomain: "map-detective-27xxx.firebaseapp.com",
+  projectId: "map-detective-27xxx",
+  storageBucket: "map-detective-27xxx.firebasestorage.app",
+  messagingSenderId: "24134xxx5400",
+  appId: "1:241341655400:web:3caxxx5c858d3ecb084edd"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+````
 * GitHub Pagesでホスティングする場合は、`.env`を利用しません。[GitHub Pages Setup for map-detective](GITHUB_SETUP.md)をご覧ください。
 
 ---
 
 ## Realtime Database の設定
 
+データベース本体の作成は Firebase Console での手動作業、セキュリティルールの反映は
+GitHub Actions からの自動デプロイと、担当が分かれています。
+
 1. 左メニュー「Build > Realtime Database」を選択。
 2. 「データベースを作成」 > ロケーションを選択。
-3. セキュリティルールは、作成時のテストモードのままにせず、下記「セキュリティルール」の手順で設定してください。
+    - ロケーションは作成時にしか選べないため、慎重に選んでください（米国でいいと思いますが）。
+3. セキュリティルールの選択画面では、ここでは「テストモード」を選んでおきます。
+
+* 本番運用時のセキュリティルールは、GitHub Actions からデプロイします。テストモードのルールはここで上書きされます。
 
 ---
 
@@ -39,18 +56,22 @@
 
 ルームを作成できる人を、特定のドメインの Google アカウントに限定しています。そのための設定です。
 
-1. 左メニュー「Build > Authentication」を選択し、「始める」を押す。
-2. 「Sign-in method」タブで **Google** を有効にする。
-3. 「Settings」タブ > 「承認済みドメイン」に、公開先のドメインを追加する。
+1. 左メニュー「セキュリティ > Authentication」を選択し、「始める」を押す。
+2. 「ログイン方法」タブで **Google** を有効にする。
+3. 「設定」タブ > 「承認済みドメイン」に、公開先のドメインを追加する。
     - GitHub Pages の場合: `map-detective.github.io`
     - Firebase Hosting の場合: `<project-id>.web.app`（既定で登録済み）
-    - `localhost` は既定で登録されているため、ローカル開発では追加不要
+    - `localhost` は既定で登録されているため追加不要
 
 招待リンクから参加する人にログインは不要です。ログインが必要なのはルームを作成するときだけです。
 
 ---
 
 ## セキュリティルール
+
+以下の設定は、GitHub Actions からデプロイしますので、マニュアル操作は不要です。
+
+---
 
 ルートを閉じたうえで、`rooms/` 配下のルーム単位でのみ読み書きを許可しています。
 
@@ -119,17 +140,28 @@ GitHub Secrets の `FIREBASE_ALLOWED_DOMAIN` にカンマ区切りで指定し�
 
 ## .env ファイルへの追加
 
-プロジェクトルートに `.env` ファイルを作成し、以下を記載：
+プロジェクトルートに `.env` ファイルを作成し、`firebaseConfig`の内容を記載します。
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCQdm5QKV0Fxxxxxxxxz4ifIGLdnpNkFmDI",
+  authDomain: "map-detective-27xxx.firebaseapp.com",
+  projectId: "map-detective-27xxx",
+  storageBucket: "map-detective-27xxx.firebasestorage.app",
+  messagingSenderId: "24134xxx5400",
+  appId: "1:241341655400:web:3caxxx5c858d3ecb084edd"
+};
+
 
 ```env
-VUE_APP_FIREBASE_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-VUE_APP_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
-VUE_APP_FIREBASE_PROJECT_ID=your-project-id
+VUE_APP_FIREBASE_API_KEY=`apiKey`
+VUE_APP_FIREBASE_AUTH_DOMAIN=`authDomain`
+VUE_APP_FIREBASE_PROJECT_ID=`projectId`
 VUE_APP_FIREBASE_DATABASE_URL=https://your-project-id.firebaseio.com
-VUE_APP_STORAGE_BUCKET=your-project-id.appspot.com
-VUE_APP_FIREBASE_MESSAGING_SENDER_ID=000000000000
-VUE_APP_FIREBASE_APP_ID=1:000000000000:web:xxxxxxxxxxxxxxxx
-VUE_APP_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX （Google Analytics を使用しないので空欄でOK）
+VUE_APP_STORAGE_BUCKET=`storageBucket`
+VUE_APP_FIREBASE_MESSAGING_SENDER_ID=`messagingSenderId`
+VUE_APP_FIREBASE_APP_ID=`appId`
+VUE_APP_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX （Google Analyticsのコード。使用しないのであれば空欄でOK）
 ```
 
 Google Maps の API キー（`VUE_APP_API_KEY`）と、ルーム作成を許可するアカウント
