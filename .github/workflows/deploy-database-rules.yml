@@ -31,6 +31,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.14'
+          cache: 'npm'
+
+      # firebase-tools は npx で都度解決すると間接依存が壊れることがあるため、
+      # package-lock.json で固定したものを使う。
+      - name: Install dependencies
+        run: npm ci
 
       - name: Generate database.rules.json
         env:
@@ -46,7 +52,7 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/service-account.json
           FIREBASE_PROJECT_ID: ${{ secrets.VUE_APP_FIREBASE_PROJECT_ID }}
-        run: npx --yes firebase-tools@13 deploy --only database --project "$FIREBASE_PROJECT_ID" --non-interactive
+        run: npx firebase deploy --only database --project "$FIREBASE_PROJECT_ID" --non-interactive
 
       - name: Remove service account key
         if: always()
