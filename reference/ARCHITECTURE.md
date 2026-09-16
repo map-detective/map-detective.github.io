@@ -56,6 +56,7 @@ src/
 ├── utils/
 │   ├── index.js         GeoJSON 検証・座標計算などの共通処理
 │   ├── allowedAccounts.js  ルーム作成を許可するアカウントの判定
+│   ├── room.js          ルーム ID の生成・検証と RTDB 参照の組み立て
 │   └── game/            スコア計算・メダル判定
 ├── models/GeoMap.js     マップ（公式・カスタム）のモデル
 └── lang/                i18n 設定と言語ファイル
@@ -73,8 +74,9 @@ src/
 | `/street-view/with-friends/:roomName` | `with-friends` | ゲーム画面 |
 | 上記以外 | — | `/` へリダイレクト |
 
-`with-friends` の `beforeEnter` で、ルーム ID に Firebase の禁止文字（`.` `#` `$` `[` `]`）が
-含まれる場合はトップへ戻す。
+`with-friends` の `beforeEnter` は `isValidRoomId`（`^[A-Za-z0-9_-]{20,64}$`）で ID を検査し、
+外れていればトップへ戻す。セキュリティルールも同じ条件で弾くが、そちらは無言で失敗するため、
+画面に入る前に処理する。
 
 ## ルーム作成・参加のフロー
 
@@ -92,20 +94,34 @@ roomName → settingsMap → settings → playerName → ゲーム開始
    - ログイン済みかつ許可アカウント → そのまま次へ
    - 未ログイン → ログインボタンを表示する。ポップアップのブロックを避けるため、
      サインインは必ず利用者の操作を起点にする
-3. ルーム名は利用者に入力させず、10 文字の擬似乱数で発行する
-4. `searchRoom` → `SETTINGS_SET_ROOM` で RTDB のルームを参照し、
+3. ルーム ID は利用者に入力させず、`generateRoomId()` が 22 文字で発行する
+   （`src/utils/room.js`）。招待リンクの ID を推測されるとルームを覗かれるため、
+   `Math.random` ではなく `crypto.getRandomValues` を使う
+4. `searchRoom` → `SETTINGS_SET_ROOM` が `roomRef()` で `rooms/<ルーム ID>` を参照し、
    `playersCounter` をトランザクションで採番して自分のプレイヤー番号を得る
 5. プレイヤー番号が 1 なら `createdAt` を書き込み、マップ選択・ゲーム設定へ進む
-6. 名前入力画面で招待 URL（`/room/<ルーム名>`）を共有する
+6. 名前入力画面で招待 URL（`/room/<ルーム ID>`）を共有する
 7. 参加者が 2 人以上そろうと「次へ」が押せるようになり、ゲームが始まる
 
 ### 参加者（2人目以降）
 
-1. 招待リンク `/room/<ルーム名>` を開く
+1. 招待リンク `/room/<ルーム ID>` を開く
 2. `CardRoomName` はルートパラメータから ID を拾い、ログインを求めずに `searchRoom` を実行する
 3. 採番されたプレイヤー番号が 2 以上なので、名前入力画面へ直行する
 4. ホストが開始すると、`size` と `streetView` の出現を監視している `searchRoom` の
    リスナーが `startGame` を呼び、ゲーム画面へ遷移する
+
+### プレイヤー名の扱い
+
+入力された名前は `setPlayerName` で正規化・検証してから RTDB に書き込む。
+
+- NFKC 正規化して前後の空白を落とす（全角英数を半角へそろえる）
+- 使える文字は英数字・ひらがな・カタカナ・漢字・`_`・`-`
+- 長さは 1〜20 文字。セキュリティルール側は 30 文字までを許すため、先に画面で弾く
+- 同じルームに同名の人がいる場合は無効とする
+
+検証を通らなかった場合は RTDB へ書き込まず、入力欄にエラーを出すだけにとどめる。
+入室時に名前が未入力なら、`player<N>` を含む仮名を先に書き込んでおく。
 
 ### 状態管理上の注意点
 
@@ -165,40 +181,51 @@ database.rules.json           ← 生成物（.gitignore 対象）
 ### ルールの要点
 
 - ルート直下は読み書き禁止
-- ルーム（`$room`）は誰でも読める。書き込みは **既存ルームなら誰でも**、
-  **新規作成は許可アカウントのみ**（`data.exists() || (許可条件)`）
-- ルーム名は `^[a-zA-Z0-9_-]{4,64}$` に限定
-- `playerName/$player` は 30 文字以内の文字列、`playersCounter` と `size` は 1〜100 の数値
+- 読み書きできるのは `rooms/$room` 配下だけ
+- ルーム（`rooms/$room`）は ID を知っていれば誰でも読める。書き込みは
+  **既存ルームなら誰でも**、**新規作成は許可アカウントのみ**（`data.exists() || (許可条件)`）
+- ルーム ID は `^[a-zA-Z0-9_-]{20,64}$` に限定。`src/utils/room.js` の
+  `ROOM_ID_PATTERN` と同じ条件を保つこと
+- 全フィールドに `.validate` を書いてスキーマを固定している。`playerName/$player` は
+  30 文字以内の文字列、`playersCounter` と `size` は 1〜100、`nbRoundSelected` と
+  `trigger` は 1〜99 の数値
+- 未知のフィールドは拒否される。アプリに値を足すときはルールの更新が必要
 
 ## Realtime Database のデータ構造
 
-ルームは DB のルート直下に、ルーム名をキーとして作られる。
+ルームは `rooms/` 配下に、ルーム ID をキーとして作られる。ルート直下に置くと、
+セキュリティルールでルームと他のデータを区別できずスキーマを固定できないため、
+`rooms/` にまとめている。パスの組み立ては `src/utils/room.js` の `roomRef()` に集約する。
 
 ```
-<roomName>/
-├── createdAt          作成時刻（ServerValue.TIMESTAMP）。未使用ルームの掃除に使う
-├── playersCounter     プレイヤー番号の採番カウンタ
-├── playerName/
-│   └── player<N>      各プレイヤーの表示名
-├── started            ゲーム開始済みフラグ（途中参加を止める）
-├── active             ゲーム進行中フラグ。消えると全員が強制退出する
-├── size               参加人数
-├── （ゲーム設定）      modeSelected / timeLimitation / difficulty / bboxObj /
-│                      countdown / scoreMode / areaParams / nbRoundSelected /
-│                      allPanorama / optimiseStreetView / zoomControl /
-│                      moveControl / panControl / timeAttackSelected /
-│                      scoreLeaderboard / guessedLeaderboard
-├── streetView/
-│   └── round<N>       出題地点（latitude / longitude / roundInfo / area / warning）
-├── round<N>/
-│   └── player<N>      回答結果（座標または地域コード / distance / points / timePassed）
-├── guess/
-│   └── player<N>      そのラウンドで回答済みかどうか
-├── finalScore/player<N>   累計距離
-├── finalPoints/player<N>  累計スコア
-├── trigger/player<N>      次ラウンドへ進む合図
-└── isGameDone/player<N>   ゲーム終了フラグ。全員分そろうとルームが削除される
+rooms/
+└── <roomId>/
+    ├── createdAt          作成時刻（ServerValue.TIMESTAMP）。未使用ルームの掃除に使う
+    ├── playersCounter     プレイヤー番号の採番カウンタ
+    ├── playerName/
+    │   └── player<N>      各プレイヤーの表示名
+    ├── started            ゲーム開始済みフラグ（途中参加を止める）
+    ├── active             ゲーム進行中フラグ。消えると全員が強制退出する
+    ├── size               参加人数
+    ├── （ゲーム設定）      modeSelected / time / timeLimitation / difficulty / bboxObj /
+    │                      countdown / scoreMode / areaParams / nbRoundSelected /
+    │                      allPanorama / optimiseStreetView / zoomControl /
+    │                      moveControl / panControl / timeAttackSelected /
+    │                      scoreLeaderboard / guessedLeaderboard
+    ├── streetView/
+    │   └── round<N>       出題地点（latitude / longitude / roundInfo / area / warning）
+    ├── round<N>/
+    │   └── player<N>      回答結果（座標または地域コード / distance / points / timePassed）
+    ├── guess/
+    │   └── player<N>      そのラウンドで回答済みかどうか
+    ├── finalScore/player<N>   累計距離
+    ├── finalPoints/player<N>  累計スコア
+    ├── trigger/player<N>      次ラウンドへ進む合図
+    └── isGameDone/player<N>   ゲーム終了フラグ。全員分そろうとルームが削除される
 ```
+
+1 ラウンドの制限時間は `time` と `timeLimitation` の両方に同じ値が入る。ゲーム画面が
+読むのは `timeLimitation` で、`time` は設定オブジェクトをそのまま書き込んだ結果として残る。
 
 出題地点を決めるのはホスト（プレイヤー番号 1）だけで、他のプレイヤーは
 `streetView/round<N>` を読んで同じ場所を表示する。
@@ -209,12 +236,14 @@ database.rules.json           ← 生成物（.gitignore 対象）
 
 ## ゲームの進行
 
-1. ホストが `StreetViewService` で出題地点を決め、`streetView/round<N>` に書き込む
-2. 全員が `round<N>` に自分のノードを作ると（`round<N>` の子要素数 === `size`）ラウンド開始
-3. 各自が地図をクリックして回答し、`guess/player<N>` と `round<N>/player<N>` を書き込む
-4. 全員の回答がそろうと結果を表示し、`trigger` を合図に次のラウンドへ進む
-5. 規定ラウンド数（既定 5、タイムアタック時は 10）を終えると `isGameDone` を立てる
-6. 全員分の `isGameDone` がそろうとルームを削除する
+1. ゲーム画面に入った各自が `active` を立てる。以降、`active` が消えたルームからは
+   全員が強制退出する（リロードやブラウザの戻る操作でも消える）
+2. ホストが `StreetViewService` で出題地点を決め、`streetView/round<N>` に書き込む
+3. 全員が `round<N>` に自分のノードを作ると（`round<N>` の子要素数 === `size`）ラウンド開始
+4. 各自が地図をクリックして回答し、`guess/player<N>` と `round<N>/player<N>` を書き込む
+5. 全員の回答がそろうと結果を表示し、`trigger` を合図に次のラウンドへ進む
+6. 規定ラウンド数（既定 5、タイムアタック時は 10）を終えると `isGameDone` を立てる
+7. 全員分の `isGameDone` がそろうと `active` を消し、ルームを削除する
 
 スコアは `src/utils/game/score.js` で距離と難易度から算出する。難易度はマップの
 バウンディングボックスの最大距離の 1/10（マップ未指定なら 2000）。
@@ -251,7 +280,24 @@ database.rules.json           ← 生成物（.gitignore 対象）
 | `npm run build` | 本番ビルド（`dist/`） |
 | `npm run lint` | ESLint + Prettier |
 | `npm run test:unit` | Jest による単体テスト |
+| `npm run test` | `lint` + `test:unit` |
 | `npm run test:rules` | Realtime Database のセキュリティルールのテスト（Java 21 以上が必要。任意） |
+| `npm run test:mutation` | Stryker によるミューテーションテスト |
+
+### CI（`ci.yml`）
+
+`main` への push、プルリクエスト、マージキューで起動し、lint → 単体テスト →
+カバレッジ送信 → ビルドの順に実行する。API キーの実値は不要なため、
+環境変数にはダミー値を入れている。
+
+`test:rules` は CI に含めていない。Emulator と Java が必要で、ルールを変更したときだけ
+手元で実行すればよいためである。詳細は [DATABASE_RULES_TEST.md](DATABASE_RULES_TEST.md) を参照。
+
+ミューテーションテスト（`ci-mutation-testing.yml`）は毎週日曜に別枠で走る。
+
+静的解析は CodeQL（`codeql-analysis.yml`）が担う。`main` への push とプルリクエスト、
+および毎週土曜の定期実行で JavaScript を解析し、結果はリポジトリの
+Security > Code scanning alerts に出る。
 
 ### GitHub Pages（`deploy-gh-pages.yml`）
 
@@ -271,6 +317,15 @@ SPA を GitHub Pages で動かすため、`public/404.html` でルーティン�
 
 `firebase.json` で `dist` を公開し、すべてのパスを `/index.html` に書き換える設定。
 手元から `firebase deploy` で配信する場合に使う。
+
+### Docker イメージ（`publish-image.yml`）
+
+`v*` タグの push と手動実行で、`ghcr.io/<リポジトリ>` へイメージを公開する
+（`linux/amd64` と `linux/arm64`）。セルフホストしたい人向けの配布物で、
+GitHub Pages / Firebase Hosting での運用には使わない。
+
+`VUE_APP_*` はビルド時にプレースホルダを埋め込んでおき、コンテナ起動時に
+`entrypoint.sh` が実際の環境変数へ置き換える。API キーをイメージに焼き込まないための作り。
 
 ## コーディング規約
 

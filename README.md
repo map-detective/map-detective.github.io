@@ -9,6 +9,8 @@
 - Firebase Realtime Database によるマルチプレイ機能対応
 - 遊び方をマルチプレイ専用に変更（ソロプレイは廃止）
 - ルーム作成を、許可した Google アカウントに限定
+- Realtime Database のセキュリティルールでアクセス制御（ルート非公開・スキーマ固定）
+- 招待 URL のルーム ID を、推測されにくい 22 文字の乱数に変更
 - Firebase Hosting / GitHub Pages でのデプロイ手順を明文化
 
 ## 🕹️ 遊び方
@@ -76,7 +78,9 @@ npm run test:unit  # 単体テスト
 npm run test:rules # セキュリティルールのテスト（任意。Java 21 以上が必要）
 ```
 
-`npm run test:rules` は Firebase Emulator を使うため Java 21 以上を必要としますが、**実行しなくても開発・ビルド・デプロイには影響しません**。`database.rules.template.json` を変更するときだけ実行してください。詳細は [セキュリティルールのテスト](reference/DATABASE_RULES_TEST.md) を参照してください。
+`main` への push とプルリクエストでは、GitHub Actions（CI）が lint・単体テスト・ビルドを実行します。
+
+`npm run test:rules` は Firebase Emulator を使うため Java 21 以上を必要としますが、**実行しなくても開発・ビルド・デプロイには影響しません**。CI にも含めていません。`database.rules.template.json` を変更するときだけ実行してください。詳細は [セキュリティルールのテスト](reference/DATABASE_RULES_TEST.md) を参照してください。
 
 ## 📄 ライセンス
 
@@ -85,5 +89,6 @@ npm run test:rules # セキュリティルールのテスト（任意。Java 21 
 
 ## ✍️ 作者
 
-- Hiroki Tabei（[@tabei-hiroki](https://github.com/tabei-hiroki)）
+- Kenichi Wakabayashi
 - 本プロジェクトは個人用途およびセルフホスト用に公開しています。
+konk

@@ -28,8 +28,11 @@
 2. 発行されたキーをコピーして `.env` に追加
 
 ```env
-VUE_APP_GOOGLE_MAPS_API_KEY=your-api-key-here
+VUE_APP_API_KEY=your-api-key-here
 ```
+
+GitHub Pages でホスティングする場合は `.env` を使わず、Secret `GMAP_API_KEY` に登録します。
+[GITHUB_SETUP.md](GITHUB_SETUP.md) を参照してください。
 
 ---
 
@@ -46,19 +49,22 @@ VUE_APP_GOOGLE_MAPS_API_KEY=your-api-key-here
 
 ## 5. Vue アプリでの使用
 
-### `main.js` での読み込み（例）
+本プロジェクトは `gmap-vue` を使い、`src/main.js` で次のように読み込んでいます。
 
 ```js
-import * as VueGoogleMaps from 'vue2-google-maps';
+import * as GmapVue from 'gmap-vue';
 
-Vue.use(VueGoogleMaps, {
-  load: {
-    key: process.env.VUE_APP_GOOGLE_MAPS_API_KEY,
-    language: 'ja',
-    libraries: 'places', // 例：Place APIを使う場合
-  }
+Vue.use(GmapVue, {
+    load: {
+        key: process.env.VUE_APP_API_KEY,
+        language: localStorage.getItem('language'),
+        v: 'weekly',
+        loading: 'async',
+    },
 });
 ```
+
+表示言語は利用者が選んだ言語（`localStorage` の `language`）を渡します。
 
 ---
 
@@ -67,8 +73,8 @@ Vue.use(VueGoogleMaps, {
 | エラー内容                     | 原因と対策                                                 |
 |------------------------------|------------------------------------------------------------|
 | `InvalidKeyMapError`         | APIキーが不正、または制限の設定が厳しすぎる可能性         |
-| `RetiredVersion`             | 読み込んでいるAPIのバージョンが古い。`v=3.exp`推奨         |
-| `key=undefined`              | `.env`の環境変数が正しく読み込まれていない                 |
+| `RetiredVersion`             | 読み込んでいるAPIのバージョンが古い。本プロジェクトは `v: 'weekly'` を指定 |
+| `key=undefined`              | `.env`の`VUE_APP_API_KEY`が正しく読み込まれていない        |
 
 ---
 

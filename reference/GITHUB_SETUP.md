@@ -19,7 +19,7 @@ GeoGuess クローン「map-detective」をGitHub Pagesでホスティングす�
 |VUE_APP_STORAGE_BUCKET|storageBucket|
 |VUE_APP_FIREBASE_MESSAGING_SENDER_ID|messagingSenderId|
 |VUE_APP_FIREBASE_APP_ID|appId|
-|VUE_APP_LIST_MAPS_JSON_URL|'https://maps.geoguess.games/maps.json'|
+|VUE_APP_FIREBASE_MEASUREMENT_ID|measurementId（Google Analytics を使わない場合は空欄）|
 
 さらに、Realtime Database のセキュリティルールと、ルームの自動削除のために以下を登録します。
 
@@ -35,16 +35,14 @@ GeoGuess クローン「map-detective」をGitHub Pagesでホスティングす�
 
 これらの Secret は、以下のワークフローで使われます。
 
-|ワークフロー|内容|
-|:--|:--|
-|Deploy Database Rules|セキュリティルールを生成して Firebase に反映|
-|Clean Rooms|1 日以上経過したルームを毎日削除|
+|ワークフロー|起動条件|内容|
+|:--|:--|:--|
+|Deploy to GitHub Pages|`main` への push、手動実行|Secret を環境変数に渡してビルドし、GitHub Pages へ公開|
+|Deploy Database Rules|テンプレート等の変更、手動実行|セキュリティルールを生成して Firebase に反映|
+|Clean Rooms|毎日 4 時（JST）、手動実行|作成から 1 日以上経過したルームを削除|
+|CI|push、プルリクエスト|lint・単体テスト・ビルドの確認（Secret は使わずダミー値でビルド）|
 
 詳しくは [Firebase セットアップ手順](FIREBASE_SETUP.md) を参照してください。
-
-`VUE_APP_LIST_MAPS_JSON_URL`はゲームで利用するMAPカタログデータで、'https://maps.geoguess.games/maps.json'を指定すれば良いようです（おそらく、自作も可能）。
-
-参考：[Maps json](MapsJson.md)
 
 Firebaseの管理画面で取得できる値との対応付けは以下の通りです。
 
@@ -62,3 +60,20 @@ const firebaseConfig = {
 ```
 
 ![](actions_secrets.png)
+
+## マップ一覧の JSON について
+
+ゲームで選べるマップの一覧は、`VUE_APP_LIST_MAPS_JSON_URL` で指定した JSON から読み込みます。
+未指定の場合は `https://maps.geoguess.games/maps.json` を使うため、**通常は設定不要です**。
+
+現在の GitHub Pages デプロイワークフローはこの変数をビルドに渡していません。
+自作のマップ一覧に差し替えるときは、Secret を登録するだけでなく、
+`.github/workflows/deploy-gh-pages.yml` の `env` にも追加してください。
+
+書式は [Maps json](MapsJson.md) を参照してください。
+
+## サブパスでの配信について
+
+デプロイワークフローは `VUE_APP_PUBLIC_PATH` に `/` を渡しています。
+`https://<ユーザー名>.github.io/<リポジトリ名>/` のようなサブパスで配信する場合は、
+この値をリポジトリ名に合わせて変更してください。
